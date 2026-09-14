@@ -61,10 +61,9 @@
     </style>
     
 <script>
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+// Register the offline worker as early as possible.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(() => {});
 }
 </script>
 
@@ -78,34 +77,31 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 #cacheStatus{margin-top:8px;font-size:12px;color:#aab4d6;min-height:18px}
 </style>
 
-<style id="offline-first-gate">
-  .app { visibility:hidden; }
-  #offlineGate {
-    position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center;
-    background:#050a18; color:#fff; font-family:system-ui,-apple-system,Segoe UI,sans-serif;
-  }
-  #offlineGate .gate-box { width:min(560px,88vw); text-align:center; padding:34px 28px;
-    border:1px solid rgba(99,230,255,.25); border-radius:22px; background:rgba(8,13,31,.92);
-    box-shadow:0 18px 55px rgba(0,0,0,.45); }
-  #offlineGate h2 { margin:0 0 10px; letter-spacing:1px; }
-  #offlineGate p { color:#aab4d6; margin:8px 0; }
-  #offlineProgress { margin-top:18px; height:8px; border-radius:99px; background:#17213d; overflow:hidden; }
-  #offlineProgressBar { height:100%; width:0%; background:#63e6ff; transition:width .2s ease; }
-  #offlineCacheStatus { margin-top:10px; font-size:13px; color:#aab4d6; min-height:20px; }
-</style></head>
-<body><div id="offlineGate">
-  <div class="gate-box">
-    <h2>OFFLINE CACHE</h2>
-    <p>Preparing the offline page first…</p>
-    <div id="offlineProgress"><div id="offlineProgressBar"></div></div>
-    <div id="offlineCacheStatus">Loading local files…</div>
+
+<style id="offline-overlay-style">
+#offlineOverlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 35%,rgba(67,232,255,.12),transparent 35%),rgba(3,7,20,.97);backdrop-filter:blur(8px);transition:opacity .35s ease,visibility .35s ease}
+#offlineOverlay.hide{opacity:0;visibility:hidden;pointer-events:none}
+.offline-card{width:min(680px,92vw);padding:24px 24px 22px;border:1px solid rgba(99,230,255,.28);border-radius:28px;background:rgba(8,14,34,.92);box-shadow:0 24px 90px rgba(0,0,0,.55),0 0 45px rgba(67,232,255,.08);text-align:center}
+.offline-card img{width:min(430px,82vw);max-height:230px;object-fit:contain;border-radius:20px;display:block;margin:0 auto 14px}
+.offline-title{font-size:24px;font-weight:900;color:#fff;letter-spacing:.5px}
+.offline-sub{margin-top:7px;color:#aab4d6;font-size:14px}
+.cache-progress{height:12px;margin:20px auto 10px;width:min(520px,86vw);background:#17213d;border-radius:999px;overflow:hidden;border:1px solid rgba(99,230,255,.18)}
+#cacheProgressBar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#43e8ff,#8b5cff);box-shadow:0 0 18px rgba(67,232,255,.35);transition:width .2s ease}
+#cacheProgressText{font-size:14px;color:#eaf8ff;font-weight:700}
+.cache-hint{margin-top:12px;font-size:11px;color:#68779e;letter-spacing:2px}
+</style>
+</head>
+<body>
+<div id="offlineOverlay" aria-live="polite">
+  <div class="offline-card">
+    <img src="./cache-art.svg" alt="Offline Cache">
+    <div class="offline-title">تحضير الكاش أوفلاين</div>
+    <div class="offline-sub">استنى حتى يكمل التحميل، بعدها تظهر صفحة التهكير</div>
+    <div class="cache-progress"><div id="cacheProgressBar"></div></div>
+    <div id="cacheProgressText">جاري فحص الكاش… 0%</div>
+    <div class="cache-hint">PS4 9.00 • OFFLINE FIRST</div>
   </div>
 </div>
-<script>
-window.__offlineCacheReady = false;
-window.__offlineCacheFailed = false;
-</script>
-
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -261,7 +257,10 @@ window.__offlineCacheFailed = false;
   }
 
   async function runJailbreak(source='AUTO') {
-    if (started || stoppedForSafety) return;
+    if (started || stoppedForSafety || !window.offlineCacheReady?.()) {
+      if (window.log) window.log('WAIT: offline cache is not ready.');
+      return;
+    }
     started = true;
     attempt++;
     retryCount = attempt;
@@ -315,10 +314,7 @@ window.__offlineCacheFailed = false;
 
   start.addEventListener('click', () => runJailbreak('MANUAL'));
 
-  // Jailbreak page is shown only after the complete offline cache is ready.
-  window.addEventListener('offline-cache-ready', () => {
-    setTimeout(() => runJailbreak('AUTO'), 250);
-  });
+  // Offline First: do not auto-run the jailbreak. The START button is enabled only after the full cache is ready.
 
   // Optional offline cache registration. The page remains fully local even if
   // Service Worker support is unavailable.
@@ -328,64 +324,98 @@ window.__offlineCacheFailed = false;
 })();
 </script>
 
-<script id="offline-cache-download">
+<script id="offline-first-controller">
 (() => {
-  const assets = ["./includes/payloads/GoldHEN/goldhen.bin", "./index.html", "./src/psfree-lapse/alert.mjs", "./src/psfree-lapse/config.mjs", "./src/psfree-lapse/kpatch/900.bin", "./src/psfree-lapse/lapse.mjs", "./src/psfree-lapse/lapse/ps4/900.mjs", "./src/psfree-lapse/module/chain.mjs", "./src/psfree-lapse/module/int64.mjs", "./src/psfree-lapse/module/mem.mjs", "./src/psfree-lapse/module/memtools.mjs", "./src/psfree-lapse/module/offset.mjs", "./src/psfree-lapse/module/rw.mjs", "./src/psfree-lapse/module/utils.mjs", "./src/psfree-lapse/module/view.mjs", "./src/psfree-lapse/psfree.mjs", "./src/psfree-lapse/rop/ps4/900.mjs", "./sw.js", "./theme/pro-void.css"];
-  const CACHE_NAME = 'PS4-GoldHEN-Offline-Cache-v3';
-  const gate = document.getElementById('offlineGate');
-  const bar = document.getElementById('offlineProgressBar');
-  const status = document.getElementById('offlineCacheStatus');
+  const ASSETS = ["./includes/payloads/GoldHEN/goldhen.bin", "./index.html", "./src/psfree-lapse/alert.mjs", "./src/psfree-lapse/config.mjs", "./src/psfree-lapse/kpatch/900.bin", "./src/psfree-lapse/lapse/ps4/900.mjs", "./src/psfree-lapse/lapse.mjs", "./src/psfree-lapse/module/chain.mjs", "./src/psfree-lapse/module/int64.mjs", "./src/psfree-lapse/module/mem.mjs", "./src/psfree-lapse/module/memtools.mjs", "./src/psfree-lapse/module/offset.mjs", "./src/psfree-lapse/module/rw.mjs", "./src/psfree-lapse/module/utils.mjs", "./src/psfree-lapse/module/view.mjs", "./src/psfree-lapse/psfree.mjs", "./src/psfree-lapse/rop/ps4/900.mjs", "./sw.js", "./theme/pro-void.css"];
+  const CACHE_NAME = 'ps4-goldhen-offline-v3';
+  const status = document.getElementById('status');
+  const start = document.getElementById('startBtn');
+  const overlay = document.getElementById('offlineOverlay');
+  const progressBar = document.getElementById('cacheProgressBar');
+  const progressText = document.getElementById('cacheProgressText');
+  let cacheReady = false;
+  function cacheProgress(done,total,label){
+    const pct = total ? Math.round(done*100/total) : 0;
+    if(progressBar) progressBar.style.width=pct+'%';
+    if(progressText) progressText.textContent=label+' '+pct+'%';
+  }
+  function hideOverlay(){ if(overlay) overlay.classList.add('hide'); }
 
-  async function cacheOne(cache, url) {
-    const req = new Request(url, {cache:'no-store'});
-    const response = await fetch(req);
-    if (!response.ok) throw new Error(url + ' -> ' + response.status);
-    await cache.put(new Request(url), response.clone());
+  function setStatus(text, cls='') {
+    if (status) { status.textContent = text; status.className = 'status ' + cls; }
+  }
+  function setStartEnabled(enabled) {
+    if (!start) return;
+    start.disabled = !enabled;
+    start.title = enabled ? 'Offline cache ready' : 'Wait for offline cache';
   }
 
-  async function preload() {
+  async function cacheIsComplete() {
+    if (!('caches' in window)) return false;
+    const cache = await caches.open(CACHE_NAME);
+    for (const url of ASSETS) {
+      if (!(await cache.match(new Request(url)))) return false;
+    }
+    return true;
+  }
+
+  async function buildOfflineCache() {
+    if (!('caches' in window)) throw new Error('Cache API unavailable');
+    const cache = await caches.open(CACHE_NAME);
+    let done = 0;
+    cacheProgress(0, ASSETS.length, 'جاري تحميل الكاش…');
+    for (const url of ASSETS) {
+      try {
+        const existing = await cache.match(new Request(url));
+        if (existing) { done++; cacheProgress(done, ASSETS.length, 'الكاش موجود…'); continue; }
+        const response = await fetch(url, {cache:'no-store', credentials:'same-origin'});
+        if (!response.ok) throw new Error(url + ' ' + response.status);
+        await cache.put(new Request(url), response.clone());
+        done++;
+        cacheProgress(done, ASSETS.length, 'جاري تحميل الكاش…');
+      } catch (e) {
+        throw new Error('CACHE FAILED: ' + url);
+      }
+    }
+    return done;
+  }
+
+  async function prepareOfflineFirst() {
+    setStartEnabled(false);
+    setStatus('OFFLINE CACHE • CHECKING…', 'running-status');
     try {
-      const cache = await caches.open(CACHE_NAME);
-      let ok = 0;
-      for (const url of assets) {
-        try {
-          await cacheOne(cache, url);
-          ok++;
-          bar.style.width = Math.round(ok * 100 / assets.length) + '%';
-          status.textContent = 'Caching offline files… ' + ok + '/' + assets.length;
-        } catch (e) {
-          status.textContent = 'Caching… ' + ok + '/' + assets.length;
-        }
+      if (await cacheIsComplete()) {
+        cacheReady = true;
+        setStatus('OFFLINE • CACHE READY • PS4 9.00', '');
+        setStartEnabled(true);
+        cacheProgress(ASSETS.length, ASSETS.length, 'الكاش جاهز…');
+        hideOverlay();
+        if (window.log) window.log('Offline cache is complete. Jailbreak page unlocked.');
+        return;
       }
-
-      // Require the critical files before revealing the jailbreak page.
-      const critical = ['./index.html','./src/psfree-lapse/psfree.mjs',
-        './src/psfree-lapse/lapse.mjs','./src/psfree-lapse/kpatch/900.bin',
-        './includes/payloads/GoldHEN/goldhen.bin'];
-      const missing = [];
-      for (const url of critical) {
-        if (!await cache.match(url)) missing.push(url);
-      }
-      if (missing.length) throw new Error('Missing: ' + missing.join(', '));
-
-      window.__offlineCacheReady = true;
-      bar.style.width = '100%';
-      status.textContent = 'CACHE READY • OFFLINE';
-      setTimeout(() => {
-        gate.style.display = 'none';
-        document.querySelector('.app').style.visibility = 'visible';
-        window.dispatchEvent(new Event('offline-cache-ready'));
-      }, 300);
+      // First visit: cache every local runtime file while online.
+      setStatus('OFFLINE CACHE • DOWNLOADING…', 'running-status');
+      await buildOfflineCache();
+      cacheReady = await cacheIsComplete();
+      if (!cacheReady) throw new Error('CACHE INCOMPLETE');
+      setStatus('CACHE READY • OFFLINE • PS4 9.00', '');
+      setStartEnabled(true);
+      cacheProgress(ASSETS.length, ASSETS.length, 'الكاش جاهز…');
+      hideOverlay();
+      if (window.log) window.log('All local assets cached. Offline mode is ready.');
     } catch (e) {
-      window.__offlineCacheFailed = true;
-      status.textContent = 'CACHE ERROR • RELOAD TO TRY AGAIN';
+      cacheReady = false;
+      setStartEnabled(false);
+      setStatus('CACHE NOT READY • CONNECT ONCE TO DOWNLOAD', 'error-status');
+      if(progressText) progressText.textContent='الكاش ما كملش • وصّل الإنترنت مرة واحدة';
+      if (window.log) window.log(String(e.message || e));
     }
   }
 
-  if ('caches' in window) preload();
-  else {
-    status.textContent = 'CACHE API NOT SUPPORTED';
-  }
+  // Expose a manual retry without adding another visible button.
+  window.prepareOfflineFirst = prepareOfflineFirst;
+  window.offlineCacheReady = () => cacheReady;
+  prepareOfflineFirst();
 })();
 </script>
 
