@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ps4-goldhen-offline-v3';
+const CACHE_NAME = 'ps4-goldhen-offline-v4';
 const CORE = ["./includes/payloads/GoldHEN/goldhen.bin", "./index.html", "./src/psfree-lapse/alert.mjs", "./src/psfree-lapse/config.mjs", "./src/psfree-lapse/kpatch/900.bin", "./src/psfree-lapse/lapse/ps4/900.mjs", "./src/psfree-lapse/lapse.mjs", "./src/psfree-lapse/module/chain.mjs", "./src/psfree-lapse/module/int64.mjs", "./src/psfree-lapse/module/mem.mjs", "./src/psfree-lapse/module/memtools.mjs", "./src/psfree-lapse/module/offset.mjs", "./src/psfree-lapse/module/rw.mjs", "./src/psfree-lapse/module/utils.mjs", "./src/psfree-lapse/module/view.mjs", "./src/psfree-lapse/psfree.mjs", "./src/psfree-lapse/rop/ps4/900.mjs", "./sw.js", "./theme/pro-void.css"];
 
 self.addEventListener('install', event => {

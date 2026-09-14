@@ -1,16 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 430">
-<defs>
- <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#43e8ff"/><stop offset="1" stop-color="#8b5cff"/></linearGradient>
- <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-</defs>
-<rect width="800" height="430" rx="42" fill="#071025"/>
-<circle cx="650" cy="80" r="120" fill="#43e8ff" opacity=".08"/>
-<circle cx="140" cy="350" r="150" fill="#8b5cff" opacity=".08"/>
-<path d="M180 280 C200 190 235 145 300 155 L355 170 L445 170 L500 155 C565 145 600 190 620 280 C632 338 594 357 560 330 L500 280 L300 280 L240 330 C206 357 168 338 180 280Z" fill="#101d3d" stroke="url(#g)" stroke-width="6" filter="url(#glow)"/>
-<circle cx="290" cy="225" r="28" fill="none" stroke="#43e8ff" stroke-width="7"/>
-<path d="M290 205v40M270 225h40" stroke="#43e8ff" stroke-width="7" stroke-linecap="round"/>
-<circle cx="500" cy="205" r="11" fill="#43e8ff"/><circle cx="535" cy="240" r="11" fill="#8b5cff"/><circle cx="465" cy="240" r="11" fill="#8b5cff"/><circle cx="500" cy="275" r="11" fill="#43e8ff"/>
-<rect x="350" y="215" width="100" height="18" rx="9" fill="#43e8ff" opacity=".18"/>
-<path d="M400 90v70M365 125h70" stroke="url(#g)" stroke-width="6" stroke-linecap="round" opacity=".8"/>
-<text x="400" y="385" text-anchor="middle" fill="#eef5ff" font-family="Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="5">OFFLINE CACHE</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 430"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#35e7ff"/><stop offset=".55" stop-color="#6d8cff"/><stop offset="1" stop-color="#ad58ff"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="800" height="430" rx="42" fill="#050b19"/><circle cx="110" cy="70" r="150" fill="#35e7ff" opacity=".07"/><circle cx="690" cy="350" r="170" fill="#a758ff" opacity=".07"/><g opacity=".16" stroke="#5be5ff"><path d="M70 110H730M70 150H730M70 190H730M70 230H730M70 270H730M70 310H730"/><path d="M110 70V360M170 70V360M230 70V360M290 70V360M350 70V360M410 70V360M470 70V360M530 70V360M590 70V360M650 70V360"/></g><g filter="url(#glow)"><circle cx="400" cy="205" r="104" fill="#08152d" stroke="url(#g)" stroke-width="5"/><circle cx="400" cy="205" r="76" fill="none" stroke="#45dcff" stroke-width="2" opacity=".5"/><path d="M400 135v140M330 205h140" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/><circle cx="400" cy="205" r="19" fill="none" stroke="#fff" stroke-width="4"/><path d="M400 178v54M373 205h54" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g><text x="400" y="365" text-anchor="middle" fill="#eafaff" font-family="Arial,sans-serif" font-size="26" font-weight="700" letter-spacing="6">OFFLINE CACHE</text><text x="400" y="392" text-anchor="middle" fill="#6e88ad" font-family="Arial,sans-serif" font-size="12" letter-spacing="3">LOCAL • FAST • READY</text></svg>

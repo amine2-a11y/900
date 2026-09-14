@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" manifest="./offline.appcache">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -79,27 +79,49 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 
 
 <style id="offline-overlay-style">
-#offlineOverlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 35%,rgba(67,232,255,.12),transparent 35%),rgba(3,7,20,.97);backdrop-filter:blur(8px);transition:opacity .35s ease,visibility .35s ease}
+#offlineOverlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:#02040b;overflow:hidden;transition:opacity .5s ease,visibility .5s ease}
+#offlineOverlay:before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 50% 48%,rgba(0,210,255,.22),transparent 18%),radial-gradient(circle at 12% 18%,rgba(38,88,255,.18),transparent 25%),radial-gradient(circle at 88% 82%,rgba(159,65,255,.18),transparent 26%),linear-gradient(135deg,#02040b,#07162c 48%,#09051a);animation:cacheAura 9s ease-in-out infinite alternate}
+#offlineOverlay:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 0 44%,rgba(72,220,255,.055) 50%,transparent 56%),linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:100% 100%,52px 52px,52px 52px;pointer-events:none}
 #offlineOverlay.hide{opacity:0;visibility:hidden;pointer-events:none}
-.offline-card{width:min(680px,92vw);padding:24px 24px 22px;border:1px solid rgba(99,230,255,.28);border-radius:28px;background:rgba(8,14,34,.92);box-shadow:0 24px 90px rgba(0,0,0,.55),0 0 45px rgba(67,232,255,.08);text-align:center}
-.offline-card img{width:min(430px,82vw);max-height:230px;object-fit:contain;border-radius:20px;display:block;margin:0 auto 14px}
-.offline-title{font-size:24px;font-weight:900;color:#fff;letter-spacing:.5px}
-.offline-sub{margin-top:7px;color:#aab4d6;font-size:14px}
-.cache-progress{height:12px;margin:20px auto 10px;width:min(520px,86vw);background:#17213d;border-radius:999px;overflow:hidden;border:1px solid rgba(99,230,255,.18)}
-#cacheProgressBar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#43e8ff,#8b5cff);box-shadow:0 0 18px rgba(67,232,255,.35);transition:width .2s ease}
-#cacheProgressText{font-size:14px;color:#eaf8ff;font-weight:700}
-.cache-hint{margin-top:12px;font-size:11px;color:#68779e;letter-spacing:2px}
+.offline-card{position:relative;z-index:2;width:min(820px,92vw);min-height:470px;padding:42px 48px 36px;border:1px solid rgba(80,220,255,.30);border-radius:32px;background:linear-gradient(145deg,rgba(7,18,39,.91),rgba(3,7,19,.96));box-shadow:0 35px 110px rgba(0,0,0,.72),0 0 100px rgba(0,180,255,.12),inset 0 1px 0 rgba(255,255,255,.10);text-align:center;overflow:hidden;backdrop-filter:blur(18px)}
+.offline-card:before{content:"";position:absolute;left:7%;right:7%;top:0;height:3px;background:linear-gradient(90deg,transparent,#29e7ff,#7d7cff,#c25cff,transparent);box-shadow:0 0 26px rgba(41,231,255,.75)}
+.offline-card:after{content:"PS4  •  LOCAL CACHE  •  OFFLINE";position:absolute;top:20px;right:28px;color:rgba(135,220,255,.42);font:800 9px ui-monospace,monospace;letter-spacing:2px}
+.cache-orb{width:148px;height:148px;margin:2px auto 24px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(41,224,255,.20) 0,rgba(41,224,255,.07) 42%,rgba(108,84,255,.05) 57%,transparent 63%);border:1px solid rgba(76,224,255,.36);box-shadow:0 0 28px rgba(41,224,255,.20),0 0 90px rgba(87,92,255,.10),inset 0 0 35px rgba(53,202,255,.08);position:relative}
+.cache-orb:before,.cache-orb:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(69,220,255,.42)}
+.cache-orb:before{inset:10px;border-top-color:#58eaff;border-right-color:transparent;animation:cacheSpin 4.5s linear infinite}
+.cache-orb:after{inset:25px;border-color:rgba(170,96,255,.46);border-left-color:transparent;animation:cacheSpin 2.8s linear infinite reverse}
+.cache-logo{font-size:48px;color:#b6f7ff;text-shadow:0 0 18px #39dcff,0 0 45px rgba(57,220,255,.7);position:relative;z-index:2}
+.offline-kicker{font:900 11px/1 ui-monospace,monospace;letter-spacing:4px;color:#5de7ff;margin-bottom:11px}
+.offline-title{font-size:34px;font-weight:950;color:#fff;letter-spacing:.2px;text-shadow:0 0 25px rgba(89,220,255,.12)}
+.offline-title span{background:linear-gradient(90deg,#57e9ff,#8e9bff 50%,#c267ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.offline-sub{margin:11px auto 0;max-width:620px;color:#9bb0d1;font-size:14px;line-height:1.7}
+.cache-progress{height:18px;margin:30px auto 12px;width:min(650px,86vw);padding:3px;background:rgba(1,7,18,.86);border-radius:999px;overflow:hidden;border:1px solid rgba(77,211,255,.25);box-shadow:inset 0 3px 9px rgba(0,0,0,.72),0 0 22px rgba(45,218,255,.07)}
+#cacheProgressBar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#18d9ff,#587fff 52%,#c05aff);box-shadow:0 0 25px rgba(45,218,255,.62);transition:width .2s ease;position:relative;overflow:hidden}
+#cacheProgressBar:after{content:"";position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:cacheShine 1.2s linear infinite}
+.cache-meta{display:flex;justify-content:space-between;width:min(650px,86vw);margin:0 auto;color:#6e85ad;font:800 10px ui-monospace,monospace;letter-spacing:1.8px}
+#cacheProgressText{font-size:16px;color:#f0fbff;font-weight:900;margin-top:15px;text-shadow:0 0 14px rgba(83,226,255,.22)}
+.cache-badge{display:inline-flex;align-items:center;gap:9px;margin-top:19px;padding:9px 15px;border:1px solid rgba(35,238,154,.25);border-radius:999px;background:rgba(5,37,29,.42);color:#73eab5;font:900 10px ui-monospace,monospace;letter-spacing:1.5px}
+.cache-badge i{width:7px;height:7px;border-radius:50%;background:#23ee9a;box-shadow:0 0 14px #23ee9a;animation:cacheBlink 1.2s ease-in-out infinite}
+.cache-hint{margin-top:17px;color:#526887;font:800 9px ui-monospace,monospace;letter-spacing:2px}
+@keyframes cacheAura{to{transform:scale(1.08) rotate(3deg)}}
+@keyframes cacheSpin{to{transform:rotate(360deg)}}
+@keyframes cacheShine{to{transform:translateX(340%)}}
+@keyframes cacheBlink{50%{opacity:.3;transform:scale(.78)}}
+@media(max-width:600px){.offline-card{min-height:0;padding:34px 17px 28px}.offline-card:after{display:none}.offline-title{font-size:25px}.offline-sub{font-size:12px}.cache-orb{width:112px;height:112px}.cache-logo{font-size:36px}.offline-kicker{letter-spacing:2.5px}}
 </style>
 </head>
 <body>
 <div id="offlineOverlay" aria-live="polite">
   <div class="offline-card">
-    <img src="./cache-art.svg" alt="Offline Cache">
-    <div class="offline-title">تحضير الكاش أوفلاين</div>
-    <div class="offline-sub">استنى حتى يكمل التحميل، بعدها تظهر صفحة التهكير</div>
+    <div class="cache-orb"><div class="cache-logo">◈</div></div>
+    <div class="offline-kicker">PSFREE LAPSE • LOCAL SYSTEM</div>
+    <div class="offline-title">تحضير <span>الكاش أوفلاين</span></div>
+    <div class="offline-sub">جاري تجهيز ملفات الصفحة محليًا. لا تغلق الصفحة حتى يكتمل الشريط، وبعدها تقدر تستعمل الواجهة بدون إنترنت.</div>
     <div class="cache-progress"><div id="cacheProgressBar"></div></div>
+    <div class="cache-meta"><span>LOCAL CACHE</span><span>PS4 9.00</span></div>
     <div id="cacheProgressText">جاري فحص الكاش… 0%</div>
-    <div class="cache-hint">PS4 9.00 • OFFLINE FIRST</div>
+    <div class="cache-badge"><i></i> OFFLINE FIRST • READY AFTER CACHE</div>
+    <div class="cache-hint">ONE-TIME PREPARATION • NO ONLINE ASSETS</div>
   </div>
 </div>
 <div class="app">
@@ -148,7 +170,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
             <span class="start-icon">▶</span>
             <span>START JAILBREAK</span>
           </button>
-          <div class="start-note">SMART AUTO • fresh retry every 3 seconds • START remains available</div>
+          <div class="start-note">OFFLINE READY • PS4 9.00 • PRESS START TO LAUNCH</div>
         </div>
       </section>
     </main>
@@ -165,7 +187,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
         <div class="console-head">
           <span class="terminal">›_</span>
           <strong>Exploit Console</strong>
-          <b>ONLINE</b>
+          <b>OFFLINE</b>
         </div>
         <div id="console" aria-live="polite">Preparing PSFree Lapse…</div>
       </section>
@@ -326,7 +348,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 
 <script id="offline-first-controller">
 (() => {
-  const ASSETS = ["./includes/payloads/GoldHEN/goldhen.bin", "./index.html", "./src/psfree-lapse/alert.mjs", "./src/psfree-lapse/config.mjs", "./src/psfree-lapse/kpatch/900.bin", "./src/psfree-lapse/lapse/ps4/900.mjs", "./src/psfree-lapse/lapse.mjs", "./src/psfree-lapse/module/chain.mjs", "./src/psfree-lapse/module/int64.mjs", "./src/psfree-lapse/module/mem.mjs", "./src/psfree-lapse/module/memtools.mjs", "./src/psfree-lapse/module/offset.mjs", "./src/psfree-lapse/module/rw.mjs", "./src/psfree-lapse/module/utils.mjs", "./src/psfree-lapse/module/view.mjs", "./src/psfree-lapse/psfree.mjs", "./src/psfree-lapse/rop/ps4/900.mjs", "./sw.js", "./theme/pro-void.css"];
+  const ASSETS = ["./cache-art.svg", "./theme/youth-bg.svg", "./includes/payloads/GoldHEN/goldhen.bin", "./index.html", "./src/psfree-lapse/alert.mjs", "./src/psfree-lapse/config.mjs", "./src/psfree-lapse/kpatch/900.bin", "./src/psfree-lapse/lapse/ps4/900.mjs", "./src/psfree-lapse/lapse.mjs", "./src/psfree-lapse/module/chain.mjs", "./src/psfree-lapse/module/int64.mjs", "./src/psfree-lapse/module/mem.mjs", "./src/psfree-lapse/module/memtools.mjs", "./src/psfree-lapse/module/offset.mjs", "./src/psfree-lapse/module/rw.mjs", "./src/psfree-lapse/module/utils.mjs", "./src/psfree-lapse/module/view.mjs", "./src/psfree-lapse/psfree.mjs", "./src/psfree-lapse/rop/ps4/900.mjs", "./sw.js", "./theme/pro-void.css"];
   const CACHE_NAME = 'ps4-goldhen-offline-v3';
   const status = document.getElementById('status');
   const start = document.getElementById('startBtn');
