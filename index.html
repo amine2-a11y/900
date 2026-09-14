@@ -67,6 +67,17 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   });
 }
 </script>
+
+<style id="cache-download-style">
+#cacheBtn{
+  margin-top:14px;padding:11px 22px;border-radius:999px;
+  border:1px solid rgba(99,230,255,.45);
+  background:rgba(12,24,50,.9);color:#fff;font-weight:700;
+  letter-spacing:.5px;cursor:pointer
+}
+#cacheStatus{margin-top:8px;font-size:12px;color:#aab4d6;min-height:18px}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -291,5 +302,58 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   }
 })();
 </script>
+
+<script id="offline-cache-download">
+(() => {
+  const assets = [
+    './',
+    './index.html',
+    './src/psfree-lapse/psfree.mjs',
+    './includes/payloads/GoldHEN/goldhen.bin',
+    './sw.js'
+  ];
+  function addCacheUI() {
+    if (document.getElementById('cacheBtn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'cacheBtn';
+    btn.type = 'button';
+    btn.textContent = 'DOWNLOAD OFFLINE CACHE';
+    const st = document.createElement('div');
+    st.id = 'cacheStatus';
+    st.textContent = 'Cache: not downloaded';
+    btn.onclick = async () => {
+      if (!('caches' in window)) {
+        st.textContent = 'Cache API not supported';
+        return;
+      }
+      btn.disabled = true;
+      st.textContent = 'Downloading cache…';
+      try {
+        const cache = await caches.open('PS4-GoldHEN-Offline-Cache-v2');
+        let ok = 0;
+        for (const url of assets) {
+          try {
+            const r = await fetch(url, {cache:'no-store'});
+            if (r.ok) { await cache.put(new Request(url), r.clone()); ok++; }
+          } catch (_) {}
+        }
+        st.textContent = ok === assets.length
+          ? 'CACHE READY • OFFLINE'
+          : 'CACHE PARTIAL • ' + ok + '/' + assets.length;
+      } catch (e) {
+        st.textContent = 'CACHE ERROR • TRY AGAIN';
+      } finally {
+        btn.disabled = false;
+      }
+    };
+    const start = document.getElementById('start');
+    (start?.parentElement || document.body).appendChild(btn);
+    (start?.parentElement || document.body).appendChild(st);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addCacheUI);
+  else addCacheUI();
+})();
+</script>
+
 </body>
 </html>
