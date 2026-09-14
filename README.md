@@ -1,4 +1,4 @@
-# PSFree Lapse 9.00 — Theme & Memory UI Fix
+# PSFree Lapse 9.00  Fix
 
 This build keeps the existing PSFree/Lapse/GoldHEN files and execution flow unchanged.
 
