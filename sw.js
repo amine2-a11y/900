@@ -27,17 +27,31 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const request = event.request;
-  event.respondWith(
-    caches.match(request).then(cached => {
-      if (cached) return cached;
-      // Network fallback is used only to populate the cache on first setup.
-      return fetch(request).then(response => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
-        }
-        return response;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
+  event.respondWith((async () => {
+    // IMPORTANT for offline module imports: retries may add ?attempt=N to the
+    // module URL. Treat that query string as a cache-buster, not as a new asset.
+    // The PS4 browser must receive the already-cached base .mjs file offline.
+    const url = new URL(request.url);
+    const cacheKey = new Request(url.origin + url.pathname, {
+      method: 'GET',
+      headers: request.headers,
+      credentials: request.credentials,
+      redirect: request.redirect
+    });
+
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(cacheKey) || await cache.match(request);
+    if (cached) return cached;
+
+    // Network fallback is used only during the one-time online preparation.
+    try {
+      const response = await fetch(request);
+      if (response && response.ok) {
+        await cache.put(cacheKey, response.clone());
+      }
+      return response;
+    } catch (_) {
+      return cache.match('./index.html');
+    }
+  })());
 });

@@ -301,7 +301,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     try { sessionStorage.setItem('payload_path', './includes/payloads/GoldHEN/goldhen.bin'); } catch (_) {}
 
     try {
-      await import('./src/psfree-lapse/psfree.mjs?attempt=' + attempt);
+      await import('./src/psfree-lapse/psfree.mjs');
       if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
       setStatus('JAILBREAK STARTED • GoldHEN', 'running-status');
       if (window.log) window.log('GoldHEN stage started.');
@@ -336,7 +336,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
       setStatus('RESETTING • NEXT TRY IN 3 SECONDS', 'error-status');
 
       autoTimer = setTimeout(() => {
-        // Cache-bust the module URL so a failed module instance is not reused.
+        // Re-run the canonical cached module; the Service Worker serves local assets offline.
         runJailbreak('AUTO-NEW-TRY');
       }, RETRY_MS);
     }
