@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# PS4 Offline First v4
+# PS4 Offline First v6
 
 CACHE:
 ./README.md
@@ -25,5 +25,3 @@ CACHE:
 ./theme/pro-void.css
 ./theme/youth-bg.svg
 
-NETWORK:
-*

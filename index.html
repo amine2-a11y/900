@@ -60,6 +60,14 @@
       .status { color:var(--muted); }
     </style>
     
+<style id="offline-no-download-style">
+html.offline-no-download #offlineOverlay{display:none !important}
+</style>
+<script>
+// Never show the cache-download screen when the PS4 browser is already offline.
+// If the cache is already stored, the normal page can use it directly.
+if (navigator.onLine === false) document.documentElement.classList.add('offline-no-download');
+</script>
 <script>
 // Register the offline worker as early as possible.
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
@@ -83,31 +91,31 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 #offlineOverlay:before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 50% 48%,rgba(0,210,255,.22),transparent 18%),radial-gradient(circle at 12% 18%,rgba(38,88,255,.18),transparent 25%),radial-gradient(circle at 88% 82%,rgba(159,65,255,.18),transparent 26%),linear-gradient(135deg,#02040b,#07162c 48%,#09051a);animation:cacheAura 9s ease-in-out infinite alternate}
 #offlineOverlay:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 0 44%,rgba(72,220,255,.055) 50%,transparent 56%),linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:100% 100%,52px 52px,52px 52px;pointer-events:none}
 #offlineOverlay.hide{opacity:0;visibility:hidden;pointer-events:none}
-.offline-card{position:relative;z-index:2;width:min(820px,92vw);min-height:470px;padding:42px 48px 36px;border:1px solid rgba(80,220,255,.30);border-radius:32px;background:linear-gradient(145deg,rgba(7,18,39,.91),rgba(3,7,19,.96));box-shadow:0 35px 110px rgba(0,0,0,.72),0 0 100px rgba(0,180,255,.12),inset 0 1px 0 rgba(255,255,255,.10);text-align:center;overflow:hidden;backdrop-filter:blur(18px)}
+.offline-card{position:relative;z-index:2;width:96vw;min-height:94vh;padding:58px 6vw 48px;display:flex;flex-direction:column;justify-content:center;border:1px solid rgba(80,220,255,.30);border-radius:32px;background:linear-gradient(145deg,rgba(7,18,39,.91),rgba(3,7,19,.96));box-shadow:0 35px 110px rgba(0,0,0,.72),0 0 100px rgba(0,180,255,.12),inset 0 1px 0 rgba(255,255,255,.10);text-align:center;overflow:hidden;backdrop-filter:blur(18px)}
 .offline-card:before{content:"";position:absolute;left:7%;right:7%;top:0;height:3px;background:linear-gradient(90deg,transparent,#29e7ff,#7d7cff,#c25cff,transparent);box-shadow:0 0 26px rgba(41,231,255,.75)}
 .offline-card:after{content:"PS4  •  LOCAL CACHE  •  OFFLINE";position:absolute;top:20px;right:28px;color:rgba(135,220,255,.42);font:800 9px ui-monospace,monospace;letter-spacing:2px}
-.cache-orb{width:148px;height:148px;margin:2px auto 24px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(41,224,255,.20) 0,rgba(41,224,255,.07) 42%,rgba(108,84,255,.05) 57%,transparent 63%);border:1px solid rgba(76,224,255,.36);box-shadow:0 0 28px rgba(41,224,255,.20),0 0 90px rgba(87,92,255,.10),inset 0 0 35px rgba(53,202,255,.08);position:relative}
+.cache-orb{width:250px;height:250px;margin:0 auto 26px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(41,224,255,.20) 0,rgba(41,224,255,.07) 42%,rgba(108,84,255,.05) 57%,transparent 63%);border:1px solid rgba(76,224,255,.36);box-shadow:0 0 28px rgba(41,224,255,.20),0 0 90px rgba(87,92,255,.10),inset 0 0 35px rgba(53,202,255,.08);position:relative}
 .cache-orb:before,.cache-orb:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(69,220,255,.42)}
 .cache-orb:before{inset:10px;border-top-color:#58eaff;border-right-color:transparent;animation:cacheSpin 4.5s linear infinite}
 .cache-orb:after{inset:25px;border-color:rgba(170,96,255,.46);border-left-color:transparent;animation:cacheSpin 2.8s linear infinite reverse}
-.cache-logo{font-size:48px;color:#b6f7ff;text-shadow:0 0 18px #39dcff,0 0 45px rgba(57,220,255,.7);position:relative;z-index:2}
+.cache-logo{font-size:86px;color:#b6f7ff;text-shadow:0 0 18px #39dcff,0 0 45px rgba(57,220,255,.7);position:relative;z-index:2}
 .offline-kicker{font:900 11px/1 ui-monospace,monospace;letter-spacing:4px;color:#5de7ff;margin-bottom:11px}
-.offline-title{font-size:34px;font-weight:950;color:#fff;letter-spacing:.2px;text-shadow:0 0 25px rgba(89,220,255,.12)}
+.offline-title{font-size:64px;font-weight:950;color:#fff;letter-spacing:.2px;text-shadow:0 0 25px rgba(89,220,255,.12)}
 .offline-title span{background:linear-gradient(90deg,#57e9ff,#8e9bff 50%,#c267ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.offline-sub{margin:11px auto 0;max-width:620px;color:#9bb0d1;font-size:14px;line-height:1.7}
-.cache-progress{height:18px;margin:30px auto 12px;width:min(650px,86vw);padding:3px;background:rgba(1,7,18,.86);border-radius:999px;overflow:hidden;border:1px solid rgba(77,211,255,.25);box-shadow:inset 0 3px 9px rgba(0,0,0,.72),0 0 22px rgba(45,218,255,.07)}
+.offline-sub{margin:14px auto 0;max-width:900px;color:#9bb0d1;font-size:14px;line-height:1.7}
+.cache-progress{height:40px;margin:34px auto 14px;width:min(1300px,90vw);padding:3px;background:rgba(1,7,18,.86);border-radius:999px;overflow:hidden;border:1px solid rgba(77,211,255,.25);box-shadow:inset 0 3px 9px rgba(0,0,0,.72),0 0 22px rgba(45,218,255,.07)}
 #cacheProgressBar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#18d9ff,#587fff 52%,#c05aff);box-shadow:0 0 25px rgba(45,218,255,.62);transition:width .2s ease;position:relative;overflow:hidden}
 #cacheProgressBar:after{content:"";position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:cacheShine 1.2s linear infinite}
-.cache-meta{display:flex;justify-content:space-between;width:min(650px,86vw);margin:0 auto;color:#6e85ad;font:800 10px ui-monospace,monospace;letter-spacing:1.8px}
-#cacheProgressText{font-size:16px;color:#f0fbff;font-weight:900;margin-top:15px;text-shadow:0 0 14px rgba(83,226,255,.22)}
-.cache-badge{display:inline-flex;align-items:center;gap:9px;margin-top:19px;padding:9px 15px;border:1px solid rgba(35,238,154,.25);border-radius:999px;background:rgba(5,37,29,.42);color:#73eab5;font:900 10px ui-monospace,monospace;letter-spacing:1.5px}
+.cache-meta{display:flex;justify-content:space-between;width:min(1300px,90vw);margin:0 auto;color:#6e85ad;font:800 10px ui-monospace,monospace;letter-spacing:1.8px}
+#cacheProgressText{font-size:19px;color:#f0fbff;font-weight:900;margin-top:15px;text-shadow:0 0 14px rgba(83,226,255,.22)}
+.cache-badge{display:inline-flex;align-items:center;gap:9px;margin-top:22px;padding:11px 18px;border:1px solid rgba(35,238,154,.25);border-radius:999px;background:rgba(5,37,29,.42);color:#73eab5;font:900 10px ui-monospace,monospace;letter-spacing:1.5px}
 .cache-badge i{width:7px;height:7px;border-radius:50%;background:#23ee9a;box-shadow:0 0 14px #23ee9a;animation:cacheBlink 1.2s ease-in-out infinite}
-.cache-hint{margin-top:17px;color:#526887;font:800 9px ui-monospace,monospace;letter-spacing:2px}
+.cache-hint{margin-top:20px;color:#526887;font:800 9px ui-monospace,monospace;letter-spacing:2px}
 @keyframes cacheAura{to{transform:scale(1.08) rotate(3deg)}}
 @keyframes cacheSpin{to{transform:rotate(360deg)}}
 @keyframes cacheShine{to{transform:translateX(340%)}}
 @keyframes cacheBlink{50%{opacity:.3;transform:scale(.78)}}
-@media(max-width:600px){.offline-card{min-height:0;padding:34px 17px 28px}.offline-card:after{display:none}.offline-title{font-size:25px}.offline-sub{font-size:12px}.cache-orb{width:112px;height:112px}.cache-logo{font-size:36px}.offline-kicker{letter-spacing:2.5px}}
+@media(max-width:600px){.offline-card{width:96vw;min-height:94vh;padding:30px 14px 24px;border-radius:24px}.offline-card:after{display:none}.offline-title{font-size:30px}.offline-sub{font-size:12px}.cache-orb{width:150px;height:150px}.cache-logo{font-size:48px}.cache-progress{height:34px;width:92vw}.cache-meta{width:92vw}.offline-kicker{letter-spacing:2.5px}}
 </style>
 </head>
 <body>
@@ -335,6 +343,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   }
 
   start.addEventListener('click', () => runJailbreak('MANUAL'));
+  window.startJailbreakAuto = () => runJailbreak('AUTO-CACHE-READY');
 
   // Offline First: do not auto-run the jailbreak. The START button is enabled only after the full cache is ready.
 
@@ -349,7 +358,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 <script id="offline-first-controller">
 (() => {
   const ASSETS = ["./cache-art.svg", "./theme/youth-bg.svg", "./includes/payloads/GoldHEN/goldhen.bin", "./index.html", "./src/psfree-lapse/alert.mjs", "./src/psfree-lapse/config.mjs", "./src/psfree-lapse/kpatch/900.bin", "./src/psfree-lapse/lapse/ps4/900.mjs", "./src/psfree-lapse/lapse.mjs", "./src/psfree-lapse/module/chain.mjs", "./src/psfree-lapse/module/int64.mjs", "./src/psfree-lapse/module/mem.mjs", "./src/psfree-lapse/module/memtools.mjs", "./src/psfree-lapse/module/offset.mjs", "./src/psfree-lapse/module/rw.mjs", "./src/psfree-lapse/module/utils.mjs", "./src/psfree-lapse/module/view.mjs", "./src/psfree-lapse/psfree.mjs", "./src/psfree-lapse/rop/ps4/900.mjs", "./sw.js", "./theme/pro-void.css"];
-  const CACHE_NAME = 'ps4-goldhen-offline-v3';
+  const CACHE_NAME = 'ps4-goldhen-offline-v6';
   const status = document.getElementById('status');
   const start = document.getElementById('startBtn');
   const overlay = document.getElementById('offlineOverlay');
@@ -374,27 +383,31 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 
   async function cacheIsComplete() {
     if (!('caches' in window)) return false;
-    const cache = await caches.open(CACHE_NAME);
-    for (const url of ASSETS) {
-      if (!(await cache.match(new Request(url)))) return false;
-    }
-    return true;
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      for (const url of ASSETS) {
+        const hit = await cache.match(new URL(url, location.href).href);
+        if (!hit) return false;
+      }
+      return true;
+    } catch (_) { return false; }
   }
 
   async function buildOfflineCache() {
     if (!('caches' in window)) throw new Error('Cache API unavailable');
     const cache = await caches.open(CACHE_NAME);
     let done = 0;
-    cacheProgress(0, ASSETS.length, 'جاري تحميل الكاش…');
+    cacheProgress(0, ASSETS.length, 'جاري تجهيز الكاش…');
     for (const url of ASSETS) {
+      const absolute = new URL(url, location.href).href;
       try {
-        const existing = await cache.match(new Request(url));
+        const existing = await cache.match(absolute);
         if (existing) { done++; cacheProgress(done, ASSETS.length, 'الكاش موجود…'); continue; }
-        const response = await fetch(url, {cache:'no-store', credentials:'same-origin'});
-        if (!response.ok) throw new Error(url + ' ' + response.status);
-        await cache.put(new Request(url), response.clone());
+        const response = await fetch(absolute, {cache:'reload', credentials:'same-origin'});
+        if (!response || !response.ok) throw new Error(absolute + ' ' + (response && response.status));
+        await cache.put(absolute, response.clone());
         done++;
-        cacheProgress(done, ASSETS.length, 'جاري تحميل الكاش…');
+        cacheProgress(done, ASSETS.length, 'جاري تجهيز الكاش…');
       } catch (e) {
         throw new Error('CACHE FAILED: ' + url);
       }
@@ -403,28 +416,55 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   }
 
   async function prepareOfflineFirst() {
+    const alreadyOffline = navigator.onLine === false;
     setStartEnabled(false);
-    setStatus('OFFLINE CACHE • CHECKING…', 'running-status');
+    if (!alreadyOffline) setStatus('OFFLINE CACHE • CHECKING…', 'running-status');
     try {
-      if (await cacheIsComplete()) {
-        cacheReady = true;
-        setStatus('OFFLINE • CACHE READY • PS4 9.00', '');
-        setStartEnabled(true);
-        cacheProgress(ASSETS.length, ASSETS.length, 'الكاش جاهز…');
-        hideOverlay();
-        if (window.log) window.log('Offline cache is complete. Jailbreak page unlocked.');
+      // IMPORTANT: when already offline, never enter buildOfflineCache().
+      // Use the previously stored cache if complete; otherwise leave the main UI visible.
+      if (alreadyOffline) {
+        if (await cacheIsComplete()) {
+          cacheReady = true;
+          try { localStorage.setItem('ps4_offline_cache_ready_v6','1'); } catch (_) {}
+          setStatus('OFFLINE • CACHE READY • PS4 9.00', '');
+          setStartEnabled(true);
+          cacheProgress(ASSETS.length, ASSETS.length, 'الكاش المحلي جاهز • أوفلاين');
+          hideOverlay();
+          if (window.log) window.log('OFFLINE MODE: LOCAL CACHE READY.');
+          setTimeout(() => { if (typeof window.startJailbreakAuto === 'function') window.startJailbreakAuto(); }, 900);
+        } else {
+          cacheReady = false;
+          setStartEnabled(false);
+          setStatus('OFFLINE • CACHE NOT READY', 'error-status');
+          if (window.log) window.log('OFFLINE: cache is not installed yet. Connect once to prepare it.');
+          hideOverlay();
+        }
         return;
       }
-      // First visit: cache every local runtime file while online.
+
+      if (await cacheIsComplete()) {
+        cacheReady = true;
+        try { localStorage.setItem('ps4_offline_cache_ready_v6','1'); } catch (_) {}
+        setStatus('OFFLINE • CACHE READY • PS4 9.00', '');
+        setStartEnabled(true);
+        cacheProgress(ASSETS.length, ASSETS.length, 'الكاش جاهز • أوفلاين…');
+        hideOverlay();
+        if (window.log) window.log('OFFLINE CACHE READY.');
+        setTimeout(() => { if (typeof window.startJailbreakAuto === 'function') window.startJailbreakAuto(); }, 900);
+        return;
+      }
+      // If the cache is missing, the first visit must be online once.
       setStatus('OFFLINE CACHE • DOWNLOADING…', 'running-status');
       await buildOfflineCache();
-      cacheReady = await cacheIsComplete();
-      if (!cacheReady) throw new Error('CACHE INCOMPLETE');
+      if (!(await cacheIsComplete())) throw new Error('CACHE INCOMPLETE');
+      cacheReady = true;
+      try { localStorage.setItem('ps4_offline_cache_ready_v6','1'); } catch (_) {}
       setStatus('CACHE READY • OFFLINE • PS4 9.00', '');
       setStartEnabled(true);
-      cacheProgress(ASSETS.length, ASSETS.length, 'الكاش جاهز…');
+      cacheProgress(ASSETS.length, ASSETS.length, 'الكاش جاهز • أوفلاين…');
       hideOverlay();
-      if (window.log) window.log('All local assets cached. Offline mode is ready.');
+      if (window.log) window.log('ALL LOCAL ASSETS CACHED. OFFLINE MODE READY.');
+      setTimeout(() => { if (typeof window.startJailbreakAuto === 'function') window.startJailbreakAuto(); }, 900);
     } catch (e) {
       cacheReady = false;
       setStartEnabled(false);
