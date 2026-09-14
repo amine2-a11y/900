@@ -81,3 +81,15 @@ body:after{content:"";position:fixed;left:-5%;right:-5%;bottom:-10%;height:38%;p
 .error-status{color:#ffb0b0;border-color:rgba(255,80,80,.4);background:rgba(40,5,8,.55)}
 @keyframes startPulse{50%{filter:brightness(1.16)}}
 @media(max-width:720px){.start-btn{min-width:min(310px,92vw);height:58px;font-size:16px}.start-panel{margin-top:24px}}
+
+/* YOUTH START SCREEN — visual-only enhancement */
+body{background:#020611 url("./youth-bg.svg") center/cover fixed no-repeat !important;}
+body:before{background:radial-gradient(circle at 50% 42%,rgba(38,220,255,.12),transparent 24%),linear-gradient(180deg,rgba(1,5,15,.12),rgba(2,4,12,.68)) !important;}
+.hero-card{background:linear-gradient(145deg,rgba(3,10,24,.76),rgba(5,16,38,.68) 52%,rgba(11,4,27,.80)),url("./youth-bg.svg") center/cover !important;border-color:rgba(66,220,255,.34);box-shadow:0 0 70px rgba(16,165,255,.14),inset 0 0 70px rgba(79,65,255,.10);}
+.hero-card:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 62%,rgba(0,218,255,.13),transparent 18%),linear-gradient(90deg,transparent,rgba(255,255,255,.035),transparent);mix-blend-mode:screen;}
+.start-panel{margin-top:38px;padding:18px 22px 20px;width:min(560px,92%);border:1px solid rgba(80,224,255,.24);border-radius:24px;background:rgba(2,8,22,.66);box-shadow:0 18px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(8px);}
+.start-panel:before{content:"READY TO LAUNCH  •  OFFLINE MODE";font:900 9px ui-monospace,monospace;letter-spacing:2.4px;color:#63e9ff;margin-bottom:10px;text-shadow:0 0 14px rgba(55,224,255,.55);}
+.start-btn{min-width:360px;height:70px;border-radius:18px;background:linear-gradient(110deg,#00bde9 0%,#246dff 45%,#813cff 100%);border-color:#6ceeff;box-shadow:0 0 32px rgba(31,192,255,.34),0 0 75px rgba(112,55,255,.18),inset 0 1px 0 rgba(255,255,255,.26);font-size:19px;text-shadow:0 2px 12px rgba(0,0,0,.3);}
+.start-btn:not(:disabled){animation:startPulse 2.8s ease-in-out infinite;}
+.start-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.14);font-size:16px;box-shadow:inset 0 0 12px rgba(255,255,255,.12);}
+.start-note{margin-top:2px;color:#8faad2;font-size:10px;}
