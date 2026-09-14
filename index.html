@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#050a18">
+<title>PSFree Lapse • Modular Edition • PS4 9.00</title>
+<link rel="stylesheet" href="./theme/pro-void.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo" aria-hidden="true">◢</div>
+      <div>
+        <div class="brand-title">PSFree <b>Lapse</b></div>
+        <div class="brand-sub">Modular Edition</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="fw-badge"><span class="server-icon">▰</span> PS4 <b>9.00</b> ONLY <i></i></div>
+      <div class="tagline">SIMPLE&nbsp;&nbsp;/&nbsp;&nbsp;FAST&nbsp;&nbsp;/&nbsp;&nbsp;STABLE</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Navigation">
+      <div class="nav active"><span>⌂</span>Home</div>
+      <div class="nav"><span>ϟ</span>Exploit</div>
+      <div class="nav"><span>⚙</span>Settings</div>
+      <div class="nav"><span>ⓘ</span>Info</div>
+      <div class="nav"><span>♙</span>Credits</div>
+    </aside>
+
+    <main class="center">
+      <section class="hero-card">
+        <div class="mountain-glow"></div>
+        <div class="only-pill">▰ &nbsp; PS4 9.00 <b>ONLY</b></div>
+        <h1>PSFree <span>Lapse</span></h1>
+        <div class="hero-sub">Modular Edition</div>
+
+        <div class="chain">
+          <div class="chain-card psfree"><div class="chain-icon">◎</div><strong>PSFree</strong><small>WEBKIT</small></div>
+          <div class="arrow cyan">➜</div>
+          <div class="chain-card lapse"><div class="chain-icon">▱</div><strong>Lapse</strong><small>KERNEL EXPLOIT</small></div>
+          <div class="arrow purple">➜</div>
+          <div class="chain-card gold"><div class="chain-icon">♛</div><strong>GoldHEN</strong><small>PAYLOAD</small></div>
+        </div>
+        <div class="freedom">FROM BROWSER &nbsp; ───── &nbsp; TO FREEDOM</div>
+      </section>
+    </main>
+
+    <aside class="rightcol">
+      <section class="gold-card">
+        <div class="crown">♛</div>
+        <div class="gold-title">GoldHEN</div>
+        <div class="version">v2.4b18.10</div>
+        <div class="ready"><i></i> Payload Ready</div>
+      </section>
+
+      <section class="console-card">
+        <div class="console-head">
+          <span class="terminal">›_</span>
+          <strong>Exploit Console</strong>
+          <b>ONLINE</b>
+        </div>
+        <div id="console" aria-live="polite">Preparing PSFree Lapse…</div>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <span>PSFree / Lapse modular</span>
+    <span>Custom Theme &nbsp;•&nbsp; PS4 9.00 &nbsp;•&nbsp; 2026</span>
+  </footer>
+</div>
+
+<script>
+/*
+ * UI-only memory guard:
+ * - Keeps the exploit mechanism unchanged.
+ * - Bounds the console to the last 80 lines.
+ * - Avoids repeatedly growing one large DOM text node.
+ * - Uses sessionStorage only for the payload path required by the existing flow.
+ */
+(function () {
+  const MAX_LOG_LINES = 80;
+  const PAYLOAD = './includes/payloads/GoldHEN/goldhen.bin';
+  const consoleEl = document.getElementById('console');
+  let lines = ['Preparing PSFree Lapse…'];
+
+  try { sessionStorage.setItem('payload_path', PAYLOAD); } catch (_) {}
+
+  function render() {
+    consoleEl.textContent = lines.join('\n');
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+
+  window.log = function (message) {
+    const text = String(message == null ? '' : message);
+    if (!text) return;
+    lines.push(text);
+    if (lines.length > MAX_LOG_LINES) lines = lines.slice(-MAX_LOG_LINES);
+    render();
+  };
+
+  window.clear_log = function () {
+    lines = [];
+    render();
+  };
+
+  window.jailbreakSuccess = function () {
+    window.log('Lapse succeeded — GoldHEN payload stage starting…');
+  };
+
+  window.addEventListener('pagehide', function () {
+    // Release UI references on page exit; no exploit state is modified.
+    lines.length = 0;
+  }, { once: true });
+
+  render();
+})();
+</script>
+<script type="module" src="./src/psfree-lapse/psfree.mjs"></script>
+
+<script>
+(() => {
+  const start = document.getElementById('startBtn') ||
+                document.querySelector('button[data-action="start"], button.start, #start');
+  const status = document.getElementById('status');
+
+  function readyUI() {
+    if (start) {
+      start.hidden = false;
+      start.disabled = false;
+      start.removeAttribute('aria-hidden');
+      start.classList.add('ready-pop');
+    }
+    if (status) {
+      status.textContent = 'OFFLINE • PS4 9.00 READY';
+      status.classList.add('online-ready');
+    }
+  }
+
+  // UI-only: waits for the local page to finish loading, then reveals START.
+  // It intentionally does NOT call the exploit automatically.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(readyUI, 350));
+  } else {
+    setTimeout(readyUI, 350);
+  }
+})();
+</script>
+
+</body>
+</html>
