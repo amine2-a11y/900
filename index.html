@@ -6,6 +6,60 @@
 <meta name="theme-color" content="#050a18">
 <title>PSFree Lapse • Modular Edition • PS4 9.00</title>
 <link rel="stylesheet" href="./theme/pro-void.css">
+
+    <style id="chic-theme">
+      :root {
+        --bg1:#070a16; --bg2:#111b3a; --accent:#63e6ff; --accent2:#9b7cff;
+        --text:#f5f7ff; --muted:#aab4d6;
+      }
+      body {
+        background:
+          radial-gradient(circle at 50% 20%, rgba(99,230,255,.16), transparent 32%),
+          radial-gradient(circle at 80% 80%, rgba(155,124,255,.14), transparent 30%),
+          linear-gradient(135deg,var(--bg1),var(--bg2)) !important;
+        color:var(--text) !important;
+        overflow:hidden;
+      }
+      body::before {
+        content:"";
+        position:fixed; inset:0; pointer-events:none; opacity:.16;
+        background-image:
+          linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+          linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+        background-size:36px 36px;
+        mask-image:linear-gradient(to bottom,black,transparent);
+      }
+      .container, main, .content {
+        position:relative; z-index:1;
+      }
+      h1,h2,.title {
+        text-shadow:0 0 22px rgba(99,230,255,.28);
+        letter-spacing:1px;
+      }
+      .card, .panel, .box {
+        background:rgba(8,13,31,.72) !important;
+        border:1px solid rgba(99,230,255,.22) !important;
+        box-shadow:0 18px 55px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+        backdrop-filter:blur(12px);
+        border-radius:22px !important;
+      }
+      #start, button.start, .start-button, button {
+        border-radius:999px !important;
+        border:1px solid rgba(99,230,255,.55) !important;
+        background:linear-gradient(135deg,#173b59,#37236b) !important;
+        color:#fff !important;
+        box-shadow:0 0 28px rgba(99,230,255,.18), inset 0 1px 0 rgba(255,255,255,.12);
+        font-weight:800 !important;
+        letter-spacing:1px;
+        transition:transform .15s ease, box-shadow .15s ease;
+      }
+      #start:hover, button:hover {
+        transform:translateY(-2px) scale(1.02);
+        box-shadow:0 0 34px rgba(99,230,255,.30), inset 0 1px 0 rgba(255,255,255,.16);
+      }
+      .status { color:var(--muted); }
+    </style>
+    
 </head>
 <body>
 <div class="app">
@@ -47,6 +101,15 @@
           <div class="chain-card gold"><div class="chain-icon">♛</div><strong>GoldHEN</strong><small>PAYLOAD</small></div>
         </div>
         <div class="freedom">FROM BROWSER &nbsp; ───── &nbsp; TO FREEDOM</div>
+
+        <div class="start-panel">
+          <div id="status" class="status">OFFLINE • PS4 9.00 READY</div>
+          <button id="startBtn" class="start-btn" type="button">
+            <span class="start-icon">▶</span>
+            <span>START JAILBREAK</span>
+          </button>
+          <div class="start-note">SMART AUTO • fresh retry every 3 seconds • START remains available</div>
+        </div>
       </section>
     </main>
 
@@ -121,36 +184,105 @@
   render();
 })();
 </script>
-<script type="module" src="./src/psfree-lapse/psfree.mjs"></script>
-
 <script>
 (() => {
-  const start = document.getElementById('startBtn') ||
-                document.querySelector('button[data-action="start"], button.start, #start');
+  const start = document.getElementById('startBtn');
   const status = document.getElementById('status');
+  let started = false;
+  let autoTimer = null;
+  let attempt = 0;
+  const RETRY_MS = 3000;
+  let retryCount = 0;
+  const MAX_RETRIES = 5;
+  let stoppedForSafety = false;
 
-  function readyUI() {
-    if (start) {
-      start.hidden = false;
+  function severeError(msg) {
+    const s = String(msg || '').toLowerCase();
+    return /kernel|panic|fatal|memory|out of memory|segmentation|abort|crash|unhandled/.test(s);
+  }
+
+  function safeStop(reason) {
+    stoppedForSafety = true;
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+    started = false;
+    start.disabled = false;
+    start.classList.remove('running');
+    setStatus('SAFE STOP • PRESS START TO TRY AGAIN', 'error-status');
+    if (window.log) window.log('SAFE STOP: ' + reason);
+  }
+
+  function setStatus(text, cls='') {
+    status.textContent = text;
+    status.className = 'status ' + cls;
+  }
+
+  async function runJailbreak(source='AUTO') {
+    if (started || stoppedForSafety) return;
+    started = true;
+    attempt++;
+    retryCount = attempt;
+    start.disabled = true;
+    start.classList.add('running');
+    setStatus(source + ' • ATTEMPT ' + attempt + ' • PS4 9.00', 'running-status');
+
+    try { sessionStorage.setItem('payload_path', './includes/payloads/GoldHEN/goldhen.bin'); } catch (_) {}
+
+    try {
+      await import('./src/psfree-lapse/psfree.mjs?attempt=' + attempt);
+      if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+      setStatus('JAILBREAK STARTED • GoldHEN', 'running-status');
+      if (window.log) window.log('GoldHEN stage started.');
+    } catch (e) {
+      const msg = String(e?.message || e || 'unknown error');
+      if (window.log) window.log('ATTEMPT ' + attempt + ': ' + msg);
+
+      // Severe/unknown errors stop the automatic loop immediately.
+      // This avoids repeatedly invoking the exploit after a potentially unstable failure.
+      if (severeError(msg)) {
+        safeStop(msg);
+        return;
+      }
+
+      // Do not hammer the same failing state. Reset only our page/session state,
+      // wait 3 seconds, then make a fresh controlled attempt.
+      started = false;
       start.disabled = false;
-      start.removeAttribute('aria-hidden');
-      start.classList.add('ready-pop');
-    }
-    if (status) {
-      status.textContent = 'OFFLINE • PS4 9.00 READY';
-      status.classList.add('online-ready');
+      start.classList.remove('running');
+
+      try {
+        sessionStorage.removeItem('psfree_attempt');
+        sessionStorage.setItem('psfree_last_error', msg.slice(0, 180));
+      } catch (_) {}
+
+      if (retryCount >= MAX_RETRIES) {
+        setStatus('STOPPED • PRESS START TO TRY AGAIN', 'error-status');
+        if (window.log) window.log('Retry limit reached; manual restart required.');
+        return;
+      }
+
+      setStatus('RESETTING • NEXT TRY IN 3 SECONDS', 'error-status');
+
+      autoTimer = setTimeout(() => {
+        // Cache-bust the module URL so a failed module instance is not reused.
+        runJailbreak('AUTO-NEW-TRY');
+      }, RETRY_MS);
     }
   }
 
-  // UI-only: waits for the local page to finish loading, then reveals START.
-  // It intentionally does NOT call the exploit automatically.
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(readyUI, 350));
-  } else {
-    setTimeout(readyUI, 350);
+  start.addEventListener('click', () => runJailbreak('MANUAL'));
+
+  // Automatic activation: first attempt immediately, then retry every 3 seconds
+  // only when the previous attempt returns an error.
+  window.addEventListener('load', () => {
+    setTimeout(() => runJailbreak('AUTO'), 250);
+  });
+
+  // Optional offline cache registration. The page remains fully local even if
+  // Service Worker support is unavailable.
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 })();
 </script>
-
 </body>
 </html>
